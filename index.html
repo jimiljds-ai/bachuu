@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Palak ❤️</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  margin:0;
+  font-family:'Comic Sans MS',cursive;
+  background:#ffe6f0;
+  text-align:center;
+  overflow-x:hidden;
+}
+.page{display:none;min-height:100vh;padding:40px 20px}
+.page.active{display:block}
+
+h1{color:#ff3366;font-size:36px}
+h2{color:#ff4d88}
+
+button{
+  padding:15px 30px;
+  font-size:18px;
+  border:none;
+  border-radius:30px;
+  cursor:pointer;
+  margin:20px;
+}
+
+#yesBtn{background:#ff4d88;color:#fff}
+#noBtn{background:#ccc;position:absolute}
+
+/* music button */
+#musicBtn{
+  background:#ff3366;
+  color:white;
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  z-index:999;
+}
+
+/* Hearts game */
+.heart{
+  font-size:30px;
+  position:absolute;
+  cursor:pointer;
+  animation:float 2s infinite alternate;
+}
+
+@keyframes float{
+  from{transform:translateY(0)}
+  to{transform:translateY(-20px)}
+}
+
+/* Matching game */
+.game-grid{
+  display:grid;
+  grid-template-columns:repeat(4,70px);
+  gap:15px;
+  justify-content:center;
+  margin-top:30px;
+}
+
+.card{
+  width:70px;
+  height:70px;
+  background:#ff99bb;
+  border-radius:15px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:32px;
+  cursor:pointer;
+}
+
+.card.matched{
+  background:#fff;
+  cursor:default;
+}
+
+/* Gallery */
+.gallery{
+  display:flex;
+  gap:40px;
+  justify-content:center;
+  flex-wrap:wrap;
+  margin-top:40px;
+}
+
+.photo-card{
+  background:#fff;
+  padding:15px;
+  width:220px;
+  border-radius:20px;
+  box-shadow:0 10px 25px rgba(255,0,100,.3);
+  opacity:0;
+  transform:translateY(30px);
+  animation:fadeUp 1s forwards;
+}
+
+.photo-card img{
+  width:100%;
+  border-radius:15px;
+  cursor:pointer;
+}
+
+.quote{margin-top:12px;color:#ff3366}
+
+@keyframes fadeUp{
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* 💥 HEART BURST */
+.burst-heart{
+  position:absolute;
+  font-size:18px;
+  pointer-events:none;
+  animation:burst 1s forwards;
+}
+
+@keyframes burst{
+  0%{transform:scale(1) translate(0,0);opacity:1}
+  100%{transform:scale(1.5) translate(var(--x), var(--y));opacity:0}
+}
+</style>
+</head>
+
+<body>
+
+<audio id="bgMusic" loop preload="auto">
+  <source src="night.mp3" type="audio/mpeg">
+</audio>
+
+<button id="musicBtn">Play Music 🎵</button>
+
+<!-- PAGE 1 -->
+<div class="page active" id="page1">
+  <h1>Palakk ❤️</h1>
+  <h2>Do you wanna be my Forever Valentine?</h2>
+  <button id="yesBtn">Yes 💖</button>
+  <button id="noBtn">No 🙄</button>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page" id="page2">
+  <h1>Catch the hearts 💘</h1>
+  <h2>Click 5 hearts to continue</h2>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page" id="page3">
+  <h1>Match the love 💍</h1>
+  <h2>Find all the pairs</h2>
+  <div class="game-grid" id="matchGrid"></div>
+</div>
+
+<!-- PAGE 4 -->
+<div class="page" id="page4">
+  <h1>Palakk 💖</h1>
+  <h2>You’re stuck with me forever 😌</h2>
+
+  <div class="gallery">
+    <div class="photo-card">
+      <img src="pic1.jpeg">
+      <div class="quote">"I promise that i will be the best version of myself for US ."</div>
+    </div>
+    <div class="photo-card">
+      <img src="pic2.jpeg">
+      <div class="quote">"I promise you I will try to make our families super super proud."</div>
+    </div>
+    <div class="photo-card">
+      <img src="pic3.jpeg">
+      <div class="quote">"I promise I will choose you, Every single day for rest of my life."</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const pages=document.querySelectorAll(".page");
+const yesBtn=document.getElementById("yesBtn");
+const noBtn=document.getElementById("noBtn");
+const music=document.getElementById("bgMusic");
+const musicBtn=document.getElementById("musicBtn");
+
+/* MUSIC */
+musicBtn.onclick=()=>{
+  music.volume = 1;
+  music.currentTime = 0;
+  music.play().catch(()=>{});
+  musicBtn.style.display="none";
+};
+
+/* NO button dodge + shrink */
+let scale=1;
+noBtn.onmouseover=()=>{
+  scale-=0.1;
+  noBtn.style.transform=`scale(${Math.max(scale,0.3)})`;
+  noBtn.style.left=Math.random()*(window.innerWidth-120)+"px";
+  noBtn.style.top=Math.random()*(window.innerHeight-120)+"px";
+};
+
+/* Hearts game */
+let heartScore=0;
+yesBtn.onclick=()=>{
+  pages[0].classList.remove("active");
+  pages[1].classList.add("active");
+  spawnHearts();
+};
+
+function spawnHearts(){
+  for(let i=0;i<5;i++){
+    const h=document.createElement("div");
+    h.className="heart";
+    h.innerText="💖";
+    h.style.left=Math.random()*(window.innerWidth-50)+"px";
+    h.style.top=Math.random()*(window.innerHeight-50)+"px";
+    h.onclick=()=>{
+      h.remove();
+      heartScore++;
+      if(heartScore===5){
+        pages[1].classList.remove("active");
+        pages[2].classList.add("active");
+        startMatchingGame();
+      }
+    };
+    document.body.appendChild(h);
+  }
+}
+
+/* Matching game */
+function startMatchingGame(){
+  const symbols=["💍","💍","❤️","❤️","🥰","🥰","🫶","🫶","🐧","🐧","🌍","🌍"];
+  symbols.sort(()=>0.5-Math.random());
+
+  const grid=document.getElementById("matchGrid");
+  grid.innerHTML="";
+  let first=null,lock=false,matched=0;
+
+  symbols.forEach(sym=>{
+    const card=document.createElement("div");
+    card.className="card";
+    card.onclick=()=>{
+      if(lock||card.classList.contains("matched"))return;
+      card.innerText=sym;
+      if(!first){first=card;}
+      else{
+        lock=true;
+        if(first.innerText===card.innerText){
+          first.classList.add("matched");
+          card.classList.add("matched");
+          matched+=2;
+          lock=false;
+          first=null;
+          if(matched===symbols.length){
+            setTimeout(()=>{
+              pages[2].classList.remove("active");
+              pages[3].classList.add("active");
+            },800);
+          }
+        }else{
+          setTimeout(()=>{
+            first.innerText="";
+            card.innerText="";
+            lock=false;
+            first=null;
+          },800);
+        }
+      }
+    };
+    grid.appendChild(card);
+  });
+}
+
+/* 💥 HEART BURST ON IMAGE CLICK */
+document.querySelectorAll(".photo-card img").forEach(img=>{
+  img.addEventListener("click", e=>{
+    for(let i=0;i<12;i++){
+      const heart=document.createElement("div");
+      heart.className="burst-heart";
+      heart.innerText="💖";
+      heart.style.left=e.pageX+"px";
+      heart.style.top=e.pageY+"px";
+      heart.style.setProperty("--x",(Math.random()*120-60)+"px");
+      heart.style.setProperty("--y",(Math.random()*120-60)+"px");
+      document.body.appendChild(heart);
+      setTimeout(()=>heart.remove(),1000);
+    }
+  });
+});
+</script>
+
+</body>
+</html>
